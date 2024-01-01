@@ -101,6 +101,38 @@ class _PokeStridesState extends State<StepCountPage> {
     });
   }
 
+  void _showUserAgreement(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("User Agreement"),
+          content: const Text(
+            'This User Agreement contains\n' 
+            'important information about how\n'
+            'to uphold friendship. By clicking\n'
+            'accept you agree to run a half\n'
+            'marathon. And no bug reports'
+          ),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Enable'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _prefs.setBool(keyIsColdStart, false);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
   @override  
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,6 +144,12 @@ class _PokeStridesState extends State<StepCountPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              ElevatedButton(
+                onPressed: () {
+                  _showUserAgreement(context);
+                },
+                child: const Text('Show User Agreement'),
+              ),
               defaultSpacing,
               Image.asset('images/bulbasaur_walking.png', fit: BoxFit.scaleDown),
               // GifView.network(
