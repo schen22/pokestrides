@@ -120,10 +120,10 @@ class _PokeStridesState extends State<StepCountPage> {
               style: TextButton.styleFrom(
                 textStyle: Theme.of(context).textTheme.labelLarge,
               ),
-              child: const Text('Enable'),
+              child: const Text('Accept'),
               onPressed: () {
                 Navigator.of(context).pop();
-                _prefs.setBool(keyIsColdStart, false);
+                // _prefs.setBool(keyIsColdStart, false);
               },
             ),
           ],
