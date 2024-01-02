@@ -50,16 +50,27 @@ class _PokeStridesState extends State<StepCountPage> {
   final gifController = GifController();
   String _status = 'N/A', _steps = '0';
 
-  late final SharedPreferences _prefs;
+  late final SharedPreferences? _prefs;
   final keyStepsToReset = 'steps_to_reset';
 
   @override
   void initState() {
     super.initState();
     initPlatformState();
+    Future.delayed(Duration.zero, () async {
+      await fetchUserPreferences();
+    });
   }
 
-  void initPlatformState() async {
+  Future<void> fetchUserPreferences() async {
+    _prefs = await SharedPreferences.getInstance();
+    if (_prefs != null && !_prefs.containsKey(keyStepsToReset)) {
+      _prefs.setInt(keyStepsToReset, 0);
+    }
+    print("Data fetched!");
+  }
+
+  void initPlatformState() {
     _pedestrianStatusStream = Pedometer.pedestrianStatusStream;
     _pedestrianStatusStream
         .listen(onPedestrianStatusChanged)
@@ -67,34 +78,47 @@ class _PokeStridesState extends State<StepCountPage> {
 
     _stepCountStream = Pedometer.stepCountStream;
     _stepCountStream.listen(onStepCount).onError(onStepCountError);
-
-    _prefs = await SharedPreferences.getInstance();
+    print("listening to step count");
     // gifController.pause();
     if (!mounted) return;
   }
 
   void onStepCount(StepCount event) {
+    print("onStepCount reached");
     setState(() {
+      print("setting state");
       _steps = calculateTotalSteps(event).toString();
     });
     // gifController.play();
   }
 
   int calculateTotalSteps(StepCount event) {
+    print("prefs = ");
+    if (_prefs == null) {
+      // initial app launch
+      return event.steps;
+    }
+    if (!_prefs.containsKey(keyStepsToReset)) {
+      _prefs.setInt(keyStepsToReset, 0);
+    }
     int currentTotalResetSteps = _prefs.getInt(keyStepsToReset) ?? 0;
-
     int totalSteps = event.steps + currentTotalResetSteps;
     if (totalSteps < 0) {
       // something went wrong; sync key to total steps
       _prefs.setInt(keyStepsToReset, -1 * event.steps);
       return 0;
     }
+    print("total steps returned");
     return totalSteps;
   }
 
   void _resetStepCount() {
     setState(() {
-      _prefs.setInt(keyStepsToReset, -1 * int.parse(_steps));
+      if (_prefs != null) {
+        _prefs.setInt(keyStepsToReset, -1 * int.parse(_steps));
+      } else {
+        throw Exception("prefs isn't present to reset");
+      }
       _steps = 0.toString();
     });
     // gifController.pause();
