@@ -3,6 +3,7 @@ import 'package:gif_view/gif_view.dart';
 import 'dart:async';
 
 import 'package:pedometer/pedometer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 String formatDate(DateTime d) {
   return d.toString().substring(0, 19);
@@ -49,13 +50,16 @@ class _PokeStridesState extends State<StepCountPage> {
   final gifController = GifController();
   String _status = 'N/A', _steps = '0';
 
+  late final SharedPreferences _prefs;
+  final keyStepsToReset = 'steps_to_reset';
+
   @override
   void initState() {
     super.initState();
     initPlatformState();
   }
 
-  void initPlatformState() {
+  void initPlatformState() async {
     _pedestrianStatusStream = Pedometer.pedestrianStatusStream;
     _pedestrianStatusStream
         .listen(onPedestrianStatusChanged)
@@ -64,22 +68,36 @@ class _PokeStridesState extends State<StepCountPage> {
     _stepCountStream = Pedometer.stepCountStream;
     _stepCountStream.listen(onStepCount).onError(onStepCountError);
 
-    gifController.pause();
+    _prefs = await SharedPreferences.getInstance();
+    // gifController.pause();
     if (!mounted) return;
   }
 
   void onStepCount(StepCount event) {
     setState(() {
-      _steps = event.steps.toString();
+      _steps = calculateTotalSteps(event).toString();
     });
-    gifController.play();
+    // gifController.play();
+  }
+
+  int calculateTotalSteps(StepCount event) {
+    int currentTotalResetSteps = _prefs.getInt(keyStepsToReset) ?? 0;
+
+    int totalSteps = event.steps + currentTotalResetSteps;
+    if (totalSteps < 0) {
+      // something went wrong; sync key to total steps
+      _prefs.setInt(keyStepsToReset, -1 * event.steps);
+      return 0;
+    }
+    return totalSteps;
   }
 
   void _resetStepCount() {
     setState(() {
+      _prefs.setInt(keyStepsToReset, -1 * int.parse(_steps));
       _steps = 0.toString();
     });
-    gifController.pause();
+    // gifController.pause();
   }
   void onPedestrianStatusChanged(PedestrianStatus event) {
     setState(() {
@@ -112,10 +130,9 @@ class _PokeStridesState extends State<StepCountPage> {
             'important information about how\n'
             'to uphold friendship. By clicking\n'
             'accept you agree to run a half\n'
-            'marathon. And no bug reports'
+            'marathon. And no bug reports.'
           ),
           actions: <Widget>[
-            // usually buttons at the bottom of the dialog
             TextButton(
               style: TextButton.styleFrom(
                 textStyle: Theme.of(context).textTheme.labelLarge,
