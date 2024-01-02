@@ -50,24 +50,19 @@ class _PokeStridesState extends State<StepCountPage> {
   final gifController = GifController();
   String _status = 'N/A', _steps = '0';
 
-  late final SharedPreferences? _prefs;
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   final keyStepsToReset = 'steps_to_reset';
 
   @override
   void initState() {
     super.initState();
     initPlatformState();
-    Future.delayed(Duration.zero, () async {
-      await fetchUserPreferences();
+    _prefs.then((SharedPreferences prefs) {
+      if (!prefs.containsKey(keyStepsToReset)) {
+        prefs.setInt(keyStepsToReset, 0);
+        print("keyStepsToReset initialized!");
+      }
     });
-  }
-
-  Future<void> fetchUserPreferences() async {
-    _prefs = await SharedPreferences.getInstance();
-    if (_prefs != null && !_prefs.containsKey(keyStepsToReset)) {
-      _prefs.setInt(keyStepsToReset, 0);
-    }
-    print("Data fetched!");
   }
 
   void initPlatformState() {
@@ -94,32 +89,31 @@ class _PokeStridesState extends State<StepCountPage> {
 
   int calculateTotalSteps(StepCount event) {
     print("prefs = ");
-    if (_prefs == null) {
-      // initial app launch
-      return event.steps;
-    }
-    if (!_prefs.containsKey(keyStepsToReset)) {
-      _prefs.setInt(keyStepsToReset, 0);
-    }
-    int currentTotalResetSteps = _prefs.getInt(keyStepsToReset) ?? 0;
-    int totalSteps = event.steps + currentTotalResetSteps;
-    if (totalSteps < 0) {
-      // something went wrong; sync key to total steps
-      _prefs.setInt(keyStepsToReset, -1 * event.steps);
-      return 0;
-    }
-    print("total steps returned");
-    return totalSteps;
+    _prefs.then((SharedPreferences prefs) {
+      if (!prefs.containsKey(keyStepsToReset)) {
+        prefs.setInt(keyStepsToReset, 0);
+        print("keyStepsToReset initialized in calculateTotalSteps");
+      }
+      int currentTotalResetSteps = prefs.getInt(keyStepsToReset) ?? 0;
+      int totalSteps = event.steps + currentTotalResetSteps;
+      if (totalSteps < 0) {
+        // something went wrong; sync key to total steps
+        prefs.setInt(keyStepsToReset, -1 * event.steps);
+        return 0;
+      }
+      return totalSteps;
+    });
+
+    print("loading");
+    return event.steps;
   }
 
   void _resetStepCount() {
     setState(() {
-      if (_prefs != null) {
-        _prefs.setInt(keyStepsToReset, -1 * int.parse(_steps));
-      } else {
-        throw Exception("prefs isn't present to reset");
-      }
-      _steps = 0.toString();
+      _prefs.then((SharedPreferences prefs) {
+        prefs.setInt(keyStepsToReset, -1 * int.parse(_steps));
+        _steps = 0.toString();
+      });
     });
     // gifController.pause();
   }
