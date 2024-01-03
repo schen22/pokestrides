@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_bubble/bubble_type.dart';
+import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:gif_view/gif_view.dart';
 import 'dart:async';
 
@@ -10,10 +12,11 @@ List<String> randomSayings = [
 ];
 
 List<String> rinQuotes = [
-  "I'm feeding you the last of my mana. So take that Holy Grail and blast it so hard there won't be a single trace left!",
+  "Victor, I'm feeding you the last of my mana. So take that Holy Grail and blast it so hard there won't be a single trace left!",
   "If you've got no way to fight, you're just getting in the way! If you're killed without accomplishing anything, then you'll have died for nothing!",
   "If you don't like pain, stand still. I'll finish you off nice and quickly!",
   "Victor, you'll get no help from me. Right here and now, show me what you've got!",
+  "A first-rate mage like myself could never lose to a third-rate hack like you!"
 ];
 
 Map<int, String> milestones = {
@@ -76,7 +79,6 @@ class _PokeStridesState extends State<StepCountPage> {
       controller: bulbasaurController,
       height: 200,
     );
-    bulbasaurController.pause();
     initPlatformState();
   }
 
@@ -141,6 +143,23 @@ class _PokeStridesState extends State<StepCountPage> {
     );
   }
 
+  // getBulbasaurSpeechBubble(CustomClipper clipper, BuildContext context) => ChatBubble(
+  //       clipper: clipper,
+  //       backGroundColor: const Color(0xffE7E7ED),
+  //       margin: const EdgeInsets.only(top: 20),
+  //       child: Container(
+  //         constraints: BoxConstraints(
+  //           maxWidth: MediaQuery.of(context).size.width * 0.7,
+  //         ),
+  //         child: const Text(
+  //           Random().nextInt(len(randomSayings) - min + 1) + min;
+
+  //           Random(0, len(randomSayings))
+  //           style: TextStyle(color: Colors.black),
+  //         ),
+  //       ),
+  //     );
+
   @override  
   Widget build(BuildContext context) {
     return Scaffold(
@@ -156,6 +175,12 @@ class _PokeStridesState extends State<StepCountPage> {
               GestureDetector(
                 onTap: () {
                   print("i'm clicked!");
+                  getReceiverView(ChatBubble(
+                    clipper: ChatBubbleClipper8(type: BubbleType.sendBubble),
+                  ), context);
+                },
+                onLongPress: () {
+                  print("insert rin quotes and replace bulbasaur image!");
                 },
                 child: bulbasaurGif, 
               ),
