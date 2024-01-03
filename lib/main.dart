@@ -47,8 +47,9 @@ class _PokeStridesState extends State<StepCountPage> {
 
   late Stream<StepCount> _stepCountStream;
   late Stream<PedestrianStatus> _pedestrianStatusStream;
-  final gifController = GifController();
-  String _status = 'N/A', _steps = '0';
+  final bulbasaurController = GifController();
+  late GifView bulbasaurGif;
+  String _steps = '0';
 
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   final keyStepsToReset = 'steps_to_reset';
@@ -56,13 +57,18 @@ class _PokeStridesState extends State<StepCountPage> {
   @override
   void initState() {
     super.initState();
+    bulbasaurGif = GifView.asset(
+      'images/bulbasaur_walking_cropped.gif', 
+      controller: bulbasaurController,
+      height: 200,
+    );
     initPlatformState();
-    _prefs.then((SharedPreferences prefs) {
-      if (!prefs.containsKey(keyStepsToReset)) {
-        prefs.setInt(keyStepsToReset, 0);
-        print("keyStepsToReset initialized!");
-      }
-    });
+    // _prefs.then((SharedPreferences prefs) {
+    //   if (!prefs.containsKey(keyStepsToReset)) {
+    //     prefs.setInt(keyStepsToReset, 0);
+    //     print("keyStepsToReset initialized!");
+    //   }
+    // });
   }
 
   void initPlatformState() {
@@ -74,7 +80,6 @@ class _PokeStridesState extends State<StepCountPage> {
     _stepCountStream = Pedometer.stepCountStream;
     _stepCountStream.listen(onStepCount).onError(onStepCountError);
     print("listening to step count");
-    // gifController.pause();
     if (!mounted) return;
   }
 
@@ -84,50 +89,43 @@ class _PokeStridesState extends State<StepCountPage> {
       print("setting state");
       _steps = calculateTotalSteps(event).toString();
     });
-    // gifController.play();
   }
 
   int calculateTotalSteps(StepCount event) {
-    print("prefs = ");
-    _prefs.then((SharedPreferences prefs) {
-      if (!prefs.containsKey(keyStepsToReset)) {
-        prefs.setInt(keyStepsToReset, 0);
-        print("keyStepsToReset initialized in calculateTotalSteps");
-      }
-      int currentTotalResetSteps = prefs.getInt(keyStepsToReset) ?? 0;
-      int totalSteps = event.steps + currentTotalResetSteps;
-      if (totalSteps < 0) {
-        // something went wrong; sync key to total steps
-        prefs.setInt(keyStepsToReset, -1 * event.steps);
-        return 0;
-      }
-      return totalSteps;
-    });
+    // _prefs.then((SharedPreferences prefs) {
+    //   if (!prefs.containsKey(keyStepsToReset)) {
+    //     prefs.setInt(keyStepsToReset, 0);
+    //     print("keyStepsToReset initialized in calculateTotalSteps");
+    //   }
+    //   int currentTotalResetSteps = prefs.getInt(keyStepsToReset) ?? 0;
+    //   int totalSteps = event.steps + currentTotalResetSteps;
+    //   if (totalSteps < 0) {
+    //     // something went wrong; sync key to total steps
+    //     prefs.setInt(keyStepsToReset, -1 * event.steps);
+    //     return 0;
+    //   }
+    //   return totalSteps;
+    // });
 
-    print("loading");
     return event.steps;
   }
 
-  void _resetStepCount() {
-    setState(() {
-      _prefs.then((SharedPreferences prefs) {
-        prefs.setInt(keyStepsToReset, -1 * int.parse(_steps));
-        _steps = 0.toString();
-      });
-    });
-    // gifController.pause();
-  }
+  // void _resetStepCount() {
+  //   setState(() {
+  //     _prefs.then((SharedPreferences prefs) {
+  //       prefs.setInt(keyStepsToReset, -1 * int.parse(_steps));
+  //       _steps = 0.toString();
+  //     });
+  //   });
+  // }
+
   void onPedestrianStatusChanged(PedestrianStatus event) {
-    setState(() {
-      _status = event.status;
-    });
+    event.status == "walking" ? bulbasaurController.play() : bulbasaurController.stop();
   }
 
   void onPedestrianStatusError(error) {
     print('onPedestrianStatusError: $error');
-    setState(() {
-      _status = 'Pedestrian Status not available';
-    });
+    bulbasaurController.play(inverted:true);
   }
 
   void onStepCountError(error) {
@@ -179,19 +177,14 @@ class _PokeStridesState extends State<StepCountPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              ElevatedButton(
-                onPressed: () {
-                  _showUserAgreement(context);
-                },
-                child: const Text('Show User Agreement'),
-              ),
-              defaultSpacing,
-              Image.asset('images/bulbasaur_walking.png', fit: BoxFit.scaleDown),
-              // GifView.network(
-              //   'https://media.tenor.com/IiwcKW9Efl4AAAAi/bulbasaur-cute.gif',
-              //   // controller: gifController,
-              //   height: 200,
+              // ElevatedButton(
+              //   onPressed: () {
+              //     _showUserAgreement(context);
+              //   },
+              //   child: const Text('Show User Agreement'),
               // ),
+              // defaultSpacing,
+              bulbasaurGif,
               defaultSpacing,
               const Text(
                 'Strides Taken',
@@ -203,33 +196,15 @@ class _PokeStridesState extends State<StepCountPage> {
                 style: const TextStyle(fontSize: 60),
               ),
               defaultSpacing,
-              // const Text(
-              //   'Pedestrian Status',
-              //   style: TextStyle(fontSize: 30),
-              // ),
-              // Icon(
-              //   _status == 'walking'
-              //       ? Icons.directions_walk
-              //       : _status == 'stopped'
-              //           ? Icons.accessibility_new
-              //           : Icons.error,
-              //   size: 100,
-              // ),
-              // Center(
-              //   child: Text(
-              //     _status,
-              //     style: _status == 'walking' || _status == 'stopped'
-              //         ? const TextStyle(fontSize: 30)
-              //         : const TextStyle(fontSize: 20, color: Colors.red),
-              //   ),
-              // )
             ],
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: _resetStepCount, 
-          tooltip: 'Reset', 
-          child: const Icon(Icons.refresh_rounded),
+          onPressed: () {
+            _showUserAgreement(context);
+          },
+          tooltip: 'Show user agrement', 
+          child: const Icon(Icons.directions_run_sharp),
         ),
     );
   }
