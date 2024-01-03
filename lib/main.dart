@@ -194,7 +194,7 @@ class _PokeStridesState extends State<StepCountPage> {
               // ),
               defaultSpacing,
               const Text(
-                'Steps Taken',
+                'Strides Taken',
                 style: TextStyle(fontSize: 30),
               ),
               defaultSpacing,
