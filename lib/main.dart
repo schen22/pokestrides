@@ -4,9 +4,25 @@ import 'dart:async';
 
 import 'package:pedometer/pedometer.dart';
 
-String formatDate(DateTime d) {
-  return d.toString().substring(0, 19);
-}
+List<String> randomSayings = [
+  "PAIN IS WEAKNESS LEAVING THE BODY",
+  "がんばって！",
+];
+
+List<String> rinQuotes = [
+  "I'm feeding you the last of my mana. So take that Holy Grail and blast it so hard there won't be a single trace left!",
+  "If you've got no way to fight, you're just getting in the way! If you're killed without accomplishing anything, then you'll have died for nothing!",
+  "If you don't like pain, stand still. I'll finish you off nice and quickly!",
+  "Victor, you'll get no help from me. Right here and now, show me what you've got!",
+];
+
+Map<int, String> milestones = {
+  34560 : "1/100 of the distance to mountain view, ca!",
+  345600 : "1/10 of the distance to mountain view, ca!",
+  864000: "a quarter of the distance to mtv WOOHOOO!",
+  1728000 : "a half the distance to mountain view!",
+  3456000 : "distance to mountain view!"
+};
 
 void main() {
   runApp(const PokeStrides());
@@ -60,6 +76,7 @@ class _PokeStridesState extends State<StepCountPage> {
       controller: bulbasaurController,
       height: 200,
     );
+    bulbasaurController.pause();
     initPlatformState();
   }
 
@@ -76,12 +93,8 @@ class _PokeStridesState extends State<StepCountPage> {
 
   void onStepCount(StepCount event) {
     setState(() {
-      _steps = calculateTotalSteps(event).toString();
+      _steps = event.steps.toString();
     });
-  }
-
-  int calculateTotalSteps(StepCount event) {
-    return event.steps;
   }
 
   void onPedestrianStatusChanged(PedestrianStatus event) {
@@ -128,7 +141,6 @@ class _PokeStridesState extends State<StepCountPage> {
     );
   }
 
-
   @override  
   Widget build(BuildContext context) {
     return Scaffold(
@@ -140,7 +152,13 @@ class _PokeStridesState extends State<StepCountPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              bulbasaurGif,
+              defaultSpacing,
+              GestureDetector(
+                onTap: () {
+                  print("i'm clicked!");
+                },
+                child: bulbasaurGif, 
+              ),
               defaultSpacing,
               const Text(
                 'Strides Taken',
