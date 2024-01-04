@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/bubble_type.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
@@ -143,22 +146,68 @@ class _PokeStridesState extends State<StepCountPage> {
     );
   }
 
-  // getBulbasaurSpeechBubble(CustomClipper clipper, BuildContext context) => ChatBubble(
-  //       clipper: clipper,
-  //       backGroundColor: const Color(0xffE7E7ED),
-  //       margin: const EdgeInsets.only(top: 20),
-  //       child: Container(
-  //         constraints: BoxConstraints(
-  //           maxWidth: MediaQuery.of(context).size.width * 0.7,
-  //         ),
-  //         child: const Text(
-  //           Random().nextInt(len(randomSayings) - min + 1) + min;
+  void _getSpeechBubble(BuildContext context, Offset tapPosition, String textContent) {
+    OverlayEntry overlayEntry;
+    overlayEntry = OverlayEntry(
+      builder: (context) {
+        double screenWidth = MediaQuery.of(context).size.width;
+        double screenHeight = MediaQuery.of(context).size.height;
+        double padding = 16.0;
 
-  //           Random(0, len(randomSayings))
-  //           style: TextStyle(color: Colors.black),
-  //         ),
-  //       ),
-  //     );
+        // Calculate the width and height based on the text content
+        TextSpan textSpan = TextSpan(text: textContent, style: const TextStyle(fontSize: 16.0));
+        TextPainter textPainter = TextPainter(text: textSpan, maxLines: null, textDirection: TextDirection.ltr);
+        textPainter.layout(maxWidth: screenWidth * 0.75 + padding); // Set a maximum width for line wrapping
+
+        double bubbleWidth = textPainter.width + padding;
+        double bubbleHeight = textPainter.height + padding;
+
+        // Calculate the position above the tapped area
+        double bubbleX = tapPosition.dx - bubbleWidth / 2;
+        double bubbleY = tapPosition.dy - bubbleHeight - 20.0;
+
+        // Ensure the bubble stays within the screen boundaries
+        if (bubbleX < 0) {
+          bubbleX = 0;
+        } else if (bubbleX + bubbleWidth > screenWidth) {
+          bubbleX = screenWidth - bubbleWidth;
+        }
+
+        if (bubbleY < 0) {
+          bubbleY = 0;
+        } else if (bubbleY + bubbleHeight > screenHeight) {
+          bubbleY = screenHeight - bubbleHeight;
+        }
+
+        return Positioned(
+          left: bubbleX,
+          top: bubbleY,
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              padding: EdgeInsets.all(padding),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8.0),
+                border: Border.all(color: Colors.black),
+              ),
+              child: Text(
+                textContent,
+                style: const TextStyle(fontSize: 16.0),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    Overlay.of(context).insert(overlayEntry);
+
+    // Close the speech bubble after a delay (you can customize the delay)
+    Future.delayed(const Duration(seconds: 3), () {
+      overlayEntry.remove();
+    });
+  } 
 
   @override  
   Widget build(BuildContext context) {
@@ -173,14 +222,11 @@ class _PokeStridesState extends State<StepCountPage> {
             children: <Widget>[
               defaultSpacing,
               GestureDetector(
-                onTap: () {
-                  print("i'm clicked!");
-                  getReceiverView(ChatBubble(
-                    clipper: ChatBubbleClipper8(type: BubbleType.sendBubble),
-                  ), context);
+                onLongPressDown: (LongPressDownDetails tapDetails) {
+                  _getSpeechBubble(context, tapDetails.globalPosition, randomSayings[Random().nextInt(randomSayings.length)]);
                 },
-                onLongPress: () {
-                  print("insert rin quotes and replace bulbasaur image!");
+                onVerticalDragUpdate: (DragUpdateDetails dragDetails) {
+                  _getSpeechBubble(context, dragDetails.globalPosition, rinQuotes[Random().nextInt(rinQuotes.length)]);
                 },
                 child: bulbasaurGif, 
               ),
