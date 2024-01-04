@@ -11,11 +11,19 @@ class SpeechBubbles {
 ];
 
   List<String> rinQuotes = [
-    "Victor, I'm feeding you the last of my mana. So take that Holy Grail and blast it so hard there won't be a single trace left!",
-    "If you've got no way to fight, you're just getting in the way! If you're killed without accomplishing anything, then you'll have died for nothing!",
+    "I'm feeding you the last of my mana.",
+    "If you've got no way to fight, you're just getting in the way!",
     "If you don't like pain, stand still. I'll finish you off nice and quickly!",
-    "Victor, you'll get no help from me. Right here and now, show me what you've got!",
-    "A first-rate mage like myself could never lose to a third-rate hack like you!"
+    "You'll get no help from me. Right here and now, show me what you've got!",
+    "A first-rate mage like myself could never lose to a third-rate hack like you!",
+    "Conquering the world seems like a pain in the butt",
+    "I'm fighting to win. That's all.",
+    "I'm Tohsaka Rin.",
+    "You can't get a feel for how a city is laid out unless you go places in person.",
+    "I'm amazed.",
+    "This is good.",
+    "What are you smirking at?",
+    "The battle I've been waiting for ten years is about to begin."
   ];
 
   String getRinQuote() {
