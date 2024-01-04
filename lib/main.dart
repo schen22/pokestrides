@@ -1,26 +1,10 @@
-import 'dart:math';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_bubble/bubble_type.dart';
-import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:gif_view/gif_view.dart';
 import 'dart:async';
 
 import 'package:pedometer/pedometer.dart';
-
-List<String> randomSayings = [
-  "PAIN IS WEAKNESS LEAVING THE BODY",
-  "がんばって！",
-];
-
-List<String> rinQuotes = [
-  "Victor, I'm feeding you the last of my mana. So take that Holy Grail and blast it so hard there won't be a single trace left!",
-  "If you've got no way to fight, you're just getting in the way! If you're killed without accomplishing anything, then you'll have died for nothing!",
-  "If you don't like pain, stand still. I'll finish you off nice and quickly!",
-  "Victor, you'll get no help from me. Right here and now, show me what you've got!",
-  "A first-rate mage like myself could never lose to a third-rate hack like you!"
-];
+import 'package:pokestrides/speech_bubbles.dart';
 
 Map<int, String> milestones = {
   34560 : "1/100 of the distance to mountain view, ca!",
@@ -146,70 +130,9 @@ class _PokeStridesState extends State<StepCountPage> {
     );
   }
 
-  void _getSpeechBubble(BuildContext context, Offset tapPosition, String textContent) {
-    OverlayEntry overlayEntry;
-    overlayEntry = OverlayEntry(
-      builder: (context) {
-        double screenWidth = MediaQuery.of(context).size.width;
-        double screenHeight = MediaQuery.of(context).size.height;
-        double padding = 16.0;
-
-        // Calculate the width and height based on the text content
-        TextSpan textSpan = TextSpan(text: textContent, style: const TextStyle(fontSize: 16.0));
-        TextPainter textPainter = TextPainter(text: textSpan, maxLines: null, textDirection: TextDirection.ltr);
-        textPainter.layout(maxWidth: screenWidth * 0.75 + padding); // Set a maximum width for line wrapping
-
-        double bubbleWidth = textPainter.width + padding;
-        double bubbleHeight = textPainter.height + padding;
-
-        // Calculate the position above the tapped area
-        double bubbleX = tapPosition.dx - bubbleWidth / 2;
-        double bubbleY = tapPosition.dy - bubbleHeight - 20.0;
-
-        // Ensure the bubble stays within the screen boundaries
-        if (bubbleX < 0) {
-          bubbleX = 0;
-        } else if (bubbleX + bubbleWidth > screenWidth) {
-          bubbleX = screenWidth - bubbleWidth;
-        }
-
-        if (bubbleY < 0) {
-          bubbleY = 0;
-        } else if (bubbleY + bubbleHeight > screenHeight) {
-          bubbleY = screenHeight - bubbleHeight;
-        }
-
-        return Positioned(
-          left: bubbleX,
-          top: bubbleY,
-          child: ChatBubble(
-            clipper: ChatBubbleClipper2(type: BubbleType.receiverBubble),
-            backGroundColor: const Color(0xffE7E7ED),
-            margin: const EdgeInsets.only(top: 20),
-            child: Container(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.7,
-              ),
-              child: Text(
-                textContent,
-                style: const TextStyle(color: Colors.black, fontSize: 12),
-              ),
-            ),
-        )
-        );
-      },
-    );
-
-    Overlay.of(context).insert(overlayEntry);
-
-    // Close the speech bubble after a delay (you can customize the delay)
-    Future.delayed(const Duration(seconds: 3), () {
-      overlayEntry.remove();
-    });
-  } 
-
   @override  
   Widget build(BuildContext context) {
+    SpeechBubbles speech = SpeechBubbles();
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -222,10 +145,10 @@ class _PokeStridesState extends State<StepCountPage> {
               defaultSpacing,
               GestureDetector(
                 onLongPressDown: (LongPressDownDetails tapDetails) {
-                  _getSpeechBubble(context, tapDetails.globalPosition, randomSayings[Random().nextInt(randomSayings.length)]);
+                  speech.getSpeechBubble(context, tapDetails.globalPosition, speech.getRandomQuote());
                 },
                 onVerticalDragUpdate: (DragUpdateDetails dragDetails) {
-                  _getSpeechBubble(context, dragDetails.globalPosition, rinQuotes[Random().nextInt(rinQuotes.length)]);
+                  speech.getSpeechBubble(context, dragDetails.globalPosition, speech.getRinQuote());
                 },
                 child: bulbasaurGif, 
               ),
