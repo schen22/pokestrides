@@ -5,11 +5,6 @@ import 'package:flutter_chat_bubble/chat_bubble.dart';
   
 
 class SpeechBubbles {
-  List<String> randomSayings = [
-  "PAIN IS WEAKNESS LEAVING THE BODY",
-  "がんばって！",
-];
-
   List<String> rinQuotes = [
     "I'm feeding you the last of my mana.",
     "If you've got no way to fight, you're just getting in the way!",
@@ -28,9 +23,6 @@ class SpeechBubbles {
 
   String getRinQuote() {
     return rinQuotes[Random().nextInt(rinQuotes.length)];
-  }
-  String getRandomQuote() {
-    return randomSayings[Random().nextInt(randomSayings.length)];
   }
 
   OverlayEntry getSpeechBubble(BuildContext context, Offset tapPosition, String textContent) {
