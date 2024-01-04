@@ -35,7 +35,7 @@ Personally I prefer using vscode so i don't have to deal with xcode or android s
 
 12.30:
 
-<img width="361" alt="image" src="https://github.com/schen22/pokestrides/assets/6363626/960a37cc-f91f-4242-a3b4-b46e6dfb6206">
+<img width="200" alt="image" src="https://github.com/schen22/pokestrides/assets/6363626/960a37cc-f91f-4242-a3b4-b46e6dfb6206">
 
 1.2:
 - add transparent background to gif
@@ -47,6 +47,10 @@ Personally I prefer using vscode so i don't have to deal with xcode or android s
 - added tap actions
 - update quotes
 - updated images
+<img width="200" alt="image" src="https://github.com/schen22/pokestrides/assets/6363626/eacaedd8-c65b-4207-b9d6-24d180a2d41a">
+<img width="200" alt="image" src="https://github.com/schen22/pokestrides/assets/6363626/e2d2d787-a66d-4783-b78f-90cc5eec689e">
+
+Screen recording: https://drive.google.com/file/d/1-TzIMkSMWxAzrtB-y8N9Ed_kJBS1Iklz/view?usp=drive_link
 
 TODO:
 - search for a more accurate pedometer library to use
