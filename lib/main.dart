@@ -182,21 +182,20 @@ class _PokeStridesState extends State<StepCountPage> {
         return Positioned(
           left: bubbleX,
           top: bubbleY,
-          child: Material(
-            color: Colors.transparent,
+          child: ChatBubble(
+            clipper: ChatBubbleClipper2(type: BubbleType.receiverBubble),
+            backGroundColor: const Color(0xffE7E7ED),
+            margin: const EdgeInsets.only(top: 20),
             child: Container(
-              padding: EdgeInsets.all(padding),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8.0),
-                border: Border.all(color: Colors.black),
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.7,
               ),
               child: Text(
                 textContent,
-                style: const TextStyle(fontSize: 16.0),
+                style: const TextStyle(color: Colors.black, fontSize: 12),
               ),
             ),
-          ),
+        )
         );
       },
     );
