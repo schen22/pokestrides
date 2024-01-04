@@ -55,6 +55,8 @@ class _PokeStridesState extends State<StepCountPage> {
   final bulbasaurController = GifController();
   late GifView bulbasaurGif;
   String _steps = '0';
+  bool _showBulbasaur = true;
+  int _numBubbleText = 0;
 
   final keyStepsToReset = 'steps_to_reset';
 
@@ -130,6 +132,41 @@ class _PokeStridesState extends State<StepCountPage> {
     );
   }
 
+  void tapBulbasaurAction(SpeechBubbles speech, TapUpDetails tapDetails) {
+    _setShowBulbasaur(false);
+    _incrementNumBubbles();
+    OverlayEntry speechBubble = speech.getSpeechBubble(context, tapDetails.globalPosition, speech.getRinQuote());
+    Overlay.of(context).insert(speechBubble);
+
+    // Remove speech bubble after delay
+    Future.delayed(const Duration(seconds: 3), () {
+      speechBubble.remove();
+      _decrementNumBubbles();
+      if (_numBubbleText == 0) {
+        _setShowBulbasaur(true);
+      }
+    });
+  }
+
+  void _setShowBulbasaur(bool show) {
+    setState(() {
+      _showBulbasaur = show;
+    });
+  }
+
+  void _decrementNumBubbles() {
+    setState(() {
+      if (_numBubbleText > 0) {
+        _numBubbleText -= 1;
+      }
+    });
+  }
+  void _incrementNumBubbles() {
+    setState(() {
+      _numBubbleText += 1;
+    });
+  }
+
   @override  
   Widget build(BuildContext context) {
     SpeechBubbles speech = SpeechBubbles();
@@ -144,13 +181,12 @@ class _PokeStridesState extends State<StepCountPage> {
             children: <Widget>[
               defaultSpacing,
               GestureDetector(
-                onLongPressDown: (LongPressDownDetails tapDetails) {
-                  speech.getSpeechBubble(context, tapDetails.globalPosition, speech.getRandomQuote());
+                onTapUp: (TapUpDetails tapDetails) {
+                  tapBulbasaurAction(speech, tapDetails);
                 },
-                onVerticalDragUpdate: (DragUpdateDetails dragDetails) {
-                  speech.getSpeechBubble(context, dragDetails.globalPosition, speech.getRinQuote());
-                },
-                child: bulbasaurGif, 
+                child: _showBulbasaur
+                  ? bulbasaurGif
+                  : Image.asset('images/rin_tohsaka.png', fit: BoxFit.scaleDown, width: 200, height: 200),
               ),
               defaultSpacing,
               const Text(

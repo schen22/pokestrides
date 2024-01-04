@@ -25,9 +25,8 @@ class SpeechBubbles {
     return randomSayings[Random().nextInt(randomSayings.length)];
   }
 
-  void getSpeechBubble(BuildContext context, Offset tapPosition, String textContent) {
-    OverlayEntry overlayEntry;
-    overlayEntry = OverlayEntry(
+  OverlayEntry getSpeechBubble(BuildContext context, Offset tapPosition, String textContent) {
+    return OverlayEntry(
       builder: (context) {
         double screenWidth = MediaQuery.of(context).size.width;
         double screenHeight = MediaQuery.of(context).size.height;
@@ -78,12 +77,5 @@ class SpeechBubbles {
         );
       },
     );
-
-    Overlay.of(context).insert(overlayEntry);
-
-    // Close the speech bubble after a delay (you can customize the delay)
-    Future.delayed(const Duration(seconds: 3), () {
-      overlayEntry.remove();
-    });
   } 
 }
