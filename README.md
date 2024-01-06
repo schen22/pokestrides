@@ -4,7 +4,11 @@ Derping and meming around with [flutter](https://docs.flutter.dev/). If:
 - Android 10+: enable permissions to enable physical activity
   - Latest apk: [1.3.24-v0.2](https://drive.google.com/file/d/1OYvTdZhNSNoNmprPsJnYhkUHgr8nSuDH/view?usp=sharing)
   - [1.1.24-v0.1 apk](https://drive.google.com/file/d/1YvbgClxDNn87RG0LV_C0QSdqhLNKrAmz/view?usp=drive_link)
-- iOS: too lazy to boot up xcode to create IPA file
+- iOS: `open ios/Runner.xcworkspace` and update Signing & Capabilities > Team. 
+  - Trust your newly created Development Certificate on your iOS device
+     via Settings > General > Device Management > [your new certificate] > Trust
+  - `flutter build ios --release`
+  - Latest [1.3.24-v0.2 apk](https://drive.google.com/drive/folders/1Dimr6GIAUYeoQfbVwfJSXn8FmphlVhg5?usp=drive_link)
 
 Main purpose: convince friends to run a half marathon, and attempt to motivate ppl while training P:
 
